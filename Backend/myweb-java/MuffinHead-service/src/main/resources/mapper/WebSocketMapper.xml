@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.MuffinHead.service.mapper.WebSocketMapper">
+
+    <insert id="save">
+        insert into myweb.websocket(time, `to`, `from`, user_id, msg, image) VALUES (#{time},#{to},#{from},#{userId},#{msg},#{image})
+    </insert>
+
+    <select id="getUserId" resultType="java.lang.Integer">
+        select a.id from myweb.user as a
+        <where>
+            a.name = #{from}
+        </where>
+    </select>
+    <select id="getAll" resultType="com.MuffinHead.service.websocket.pojo.Message">
+        select a.id,a.time,a.`to`,a.`from`,a.user_id,a.msg,a.image from myweb.websocket a
+        ORDER BY STR_TO_DATE(a.time, '%Y/%m/%d %H:%i:%s');
+    </select>
+
+</mapper>

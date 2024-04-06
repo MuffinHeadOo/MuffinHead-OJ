@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.MuffinHead.service.mapper.AdminMapper">
+    <insert id="addProblem"  useGeneratedKeys="true" keyProperty="id">
+        insert into myweb.topic (topic,accepted,submit,user_id,created_time,label)
+        values (#{topic}, #{accepted}, #{submit}, #{userId}, #{createdTime}, #{label})
+    </insert>
+
+    <insert id="addProblemContent">
+        insert into myweb.topic_content (topic_id, content,input,output)
+        values (#{topicId}, #{content}, #{input}, #{output})
+    </insert>
+
+    <insert id="addAnnouncemen" useGeneratedKeys="true" keyProperty="id">
+        insert into myweb.announcement (topic, content,user_id,created_time)
+        values (#{topic}, #{content}, #{userId}, #{createdTime})
+    </insert>
+
+    <update id="saveProblem">
+        UPDATE myweb.topic a JOIN myweb.topic_content b on a.id = b.topic_id
+        set a.topic=#{topic},a.label=#{label},b.content=#{content},b.input=#{input},b.output=#{output} where a.id = #{id}
+    </update>
+    <update id="saveAnnouncement">
+        UPDATE myweb.announcement a
+        set a.topic=#{topic},a.content=#{content} where a.id = #{id}
+    </update>
+
+
+    <delete id="delContent">
+        delete from myweb.topic_content where topic_id = #{id};
+    </delete>
+    <delete id="delProblem">
+        delete from myweb.topic where id = #{id};
+    </delete>
+    <delete id="delAnnouncement">
+        delete from myweb.announcement where id = #{id};
+    </delete>
+    <select id="problemChangeShowBack" resultType="com.MuffinHead.model.admin.dtos.ChangeProblemMapper">
+        select a.topic,a.label,b.content,b.input,b.output from myweb.topic a left join myweb.topic_content b on a.id = b.topic_id
+        <where>
+            and a.id=#{id}
+        </where>
+    </select>
+
+    <select id="announcement" resultType="com.MuffinHead.model.admin.vos.AnnouncementPageQueryVo">
+        select a.id,a.topic,a.user_id,a.created_time,b.name as userName from myweb.announcement a left join myweb.user b on a.user_id=b.id
+        <where>
+            <if test="topic != null">
+                and a.topic like concat('%',#{topic},'%')
+            </if>
+
+            <if test="userName != null">
+                and b.name like concat('%',#{userName},'%')
+            </if>
+
+        </where>
+        order by a.created_time desc
+    </select>
+    <select id="announcemenChangeShowBack" resultType="com.MuffinHead.model.admin.dtos.Announcemen">
+        select a.content,a.id,a.topic,a.user_id,a.created_time,b.name as userName from myweb.announcement a left join myweb.user b on a.user_id=b.id
+        where a.id=#{id}
+    </select>
+
+
+</mapper>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.MuffinHead.service.mapper.CodeMapper">
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into myweb.submissions(topic_id,user_id,language,code,result,execution_time,memory,submit_time)
+        values(#{topicId},#{userId},#{language},#{code},#{result},#{executionTime},#{memory},#{submitTime})
+    </insert>
+</mapper>

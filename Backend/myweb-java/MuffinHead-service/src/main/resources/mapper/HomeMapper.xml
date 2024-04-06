@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.MuffinHead.service.mapper.HomeMapper">
+
+
+
+    <insert id="commit" useGeneratedKeys="true" keyProperty="id">
+        insert into myweb.commit (topic_id, user_id, code, commit_time)
+        values (#{topicId}, #{userId}, #{code}, #{commitTime})
+    </insert>
+    <update id="updateCommit">
+        UPDATE myweb.topic
+        SET myweb.topic.submit = myweb.topic.submit + 1
+        WHERE id = #{topicId};
+    </update>
+
+    <update id="updateCommitAndAccepted">
+        UPDATE myweb.topic
+        SET myweb.topic.accepted = myweb.topic.accepted + 1
+        WHERE id = #{topicId};
+    </update>
+
+    <select id="list" resultType="com.MuffinHead.model.topic.vos.TopicPageQueryVo">
+        select a.id,a.topic,a.accepted,a.submit,a.created_time,b.name as userName ,a.user_id from myweb.topic a left join myweb.user b on a.user_id=b.id
+        <where>
+            <if test="topic != null">
+                and a.topic like concat('%',#{topic},'%')
+            </if>
+
+            <if test="userName != null">
+                and b.name like concat('%',#{userName},'%')
+            </if>
+
+        </where>
+        order by a.created_time desc
+    </select>
+
+    <select id="getTopic" resultType="com.MuffinHead.model.topic.vos.TopicContentVo">
+        select a.topic,a.accepted,a.submit,a.label,a.created_time,b.name as userName,c.content,c.input,c.output from myweb.topic a left join myweb.user b on a.user_id=b.id left join myweb.topic_content c on a.id = c.topic_id
+        <where>
+            and a.id=#{id}
+        </where>
+    </select>
+
+    <select id="submissionsList" resultType="com.MuffinHead.model.topic.vos.CommitPageQueryVo">
+        SELECT a.id, a.topic_id as topicId, b.topic, c.`name` as userName, c.id as userId, a.`language`, a.result, a.execution_time, a.memory, a.submit_time  FROM myweb.submissions a left join myweb.topic b on a.topic_id = b.id left join myweb.user c on a.user_id = c.id
+        <where>
+            <if test="topic != null">
+                and b.topic like concat('%',#{topic},'%')
+            </if>
+            <if test="userName != null">
+                and c.name like concat('%',#{userName},'%')
+            </if>
+            <if test="result != null">
+                and a.result = #{result}
+            </if>
+            <if test="resultList != null and resultList.size > 0">
+                AND a.result NOT IN
+                <foreach item="item" index="index" collection="resultList" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by a.submit_time desc
+    </select>
+
+    <select id="mySubmissionsList" resultType="com.MuffinHead.model.topic.vos.CommitPageQueryVo">
+        SELECT a.id, a.topic_id as topicId ,b.topic, c.`name` as userName,a.`language`, a.result, a.execution_time, a.memory, a.submit_time  FROM myweb.submissions a left join myweb.topic b on a.topic_id = b.id left join myweb.user c on a.user_id = c.id
+            where a.user_id = #{id}
+        order by a.submit_time desc
+
+    </select>
+    <select id="commitDetail" resultType="com.MuffinHead.model.topic.vos.CommitDetailVo">
+        SELECT a.id, a.topic_id as topicId ,b.topic, c.`name` as userName, a.`language`, a.result, a.execution_time, a.memory, a.submit_time,a.code  FROM myweb.submissions a left join myweb.topic b on a.topic_id = b.id left join myweb.user c on a.user_id = c.id
+        where a.id = #{id}
+    </select>
+    <select id="announcement" resultType="com.MuffinHead.model.admin.dtos.Announcemen">
+        select a.id, a.topic, a.content, a.user_id, a.created_time,b.name as userName from myweb.announcement a left join myweb.user b on b.id = a.user_id
+        order by a.created_time desc
+    </select>
+    <select id="announcementDetail" resultType="com.MuffinHead.model.admin.dtos.Announcemen">
+        select a.id, a.topic, a.content, a.user_id, a.created_time,b.name as userName from myweb.announcement a left join myweb.user b on b.id = a.user_id
+        where a.id = #{id}
+    </select>
+
+</mapper>
